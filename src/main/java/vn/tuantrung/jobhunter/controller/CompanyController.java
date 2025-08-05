@@ -1,5 +1,7 @@
 package vn.tuantrung.jobhunter.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +13,13 @@ import vn.tuantrung.jobhunter.service.CompanyService;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PutMapping;
+
+
 
 
 @RestController
@@ -27,5 +36,25 @@ public class CompanyController {
         
         return ResponseEntity.status(HttpStatus.CREATED).body(this.companyService.handleCreateCompany(reqCompany));
     }
+
+    @GetMapping("/companies")
+    public ResponseEntity<List<Company>> getAllCompany() {
+        List<Company> companies = this.companyService.fetchAllCompanies();
+        return ResponseEntity.ok(companies);
+    }
+
+    @DeleteMapping("/companies/{id}")
+    public ResponseEntity<Void> deleteCompany(@PathVariable("id") long id) {
+        this.companyService.handleDeleteCompany(id);
+        return ResponseEntity.ok(null);
+    }
+
+    @PutMapping("companies")
+    public ResponseEntity<Company> updateCompany(@RequestBody Company company) {
+        //TODO: process PUT request
+        Company reqCompany = this.companyService.handleUpdateCompany(company);
+        return ResponseEntity.ok(reqCompany);
+    }
+    
     
 }
