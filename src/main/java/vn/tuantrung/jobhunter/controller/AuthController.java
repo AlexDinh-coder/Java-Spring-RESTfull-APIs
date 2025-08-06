@@ -15,6 +15,7 @@ import vn.tuantrung.jobhunter.domain.dto.ResLoginDTO;
 import vn.tuantrung.jobhunter.util.SecurityUtil;
 
 @RestController
+
 public class AuthController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final SecurityUtil securityUtil;
