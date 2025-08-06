@@ -3,9 +3,14 @@ package vn.tuantrung.jobhunter.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import org.springframework.stereotype.Service;
 
 import vn.tuantrung.jobhunter.domain.User;
+import vn.tuantrung.jobhunter.domain.dto.Meta;
+import vn.tuantrung.jobhunter.domain.dto.ResultPaginationDTO;
 import vn.tuantrung.jobhunter.repository.UserRepository;
 
 @Service
@@ -32,8 +37,21 @@ public class UserService {
         return null;
     }
 
-    public List<User> fetchAllUsers() {
-        return this.userRepository.findAll();
+    public ResultPaginationDTO fetchAllUsers(Pageable pageable) {
+        Page<User> pageUser = this.userRepository.findAll(pageable);
+        ResultPaginationDTO rs = new ResultPaginationDTO();
+        Meta meta = new Meta();
+
+        meta.setPage(pageUser.getNumber());
+        meta.setPageSize(pageUser.getSize());
+
+        meta.setPages(pageUser.getTotalPages());
+        meta.setTotal(pageUser.getTotalElements());
+
+        rs.setMeta(meta);
+        rs.setResult(pageUser.getContent());
+
+        return rs;
     }
 
     public User handleUpdateUser(User user) {
@@ -42,8 +60,8 @@ public class UserService {
             currentUser.setName(user.getName());
             currentUser.setEmail(user.getEmail());
             currentUser.setPassword(user.getPassword());
-            //update
-            currentUser =  this.userRepository.save(currentUser);
+            // update
+            currentUser = this.userRepository.save(currentUser);
         }
         return currentUser;
     }
