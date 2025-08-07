@@ -12,15 +12,18 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import vn.tuantrung.jobhunter.domain.RestRespone;
 
 @RestControllerAdvice
 public class GlobalException {
     @ExceptionHandler(value = {
-            
+
             UsernameNotFoundException.class,
-            BadCredentialsException.class
+            BadCredentialsException.class,
+            IdInvalidException.class
+
     })
     public ResponseEntity<RestRespone<Object>> handleIdException(Exception ex) {
         RestRespone<Object> res = new RestRespone<Object>();
@@ -29,6 +32,16 @@ public class GlobalException {
         res.setMessage("Exception occurred");
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+    }
+
+    @ExceptionHandler(value = { NoResourceFoundException.class,
+    })
+    public ResponseEntity<RestRespone<Object>> handleNotFoundException(Exception ex) {
+        RestRespone<Object> respone = new RestRespone<Object>();
+        respone.setStatusCode(HttpStatus.NOT_FOUND.value());
+        respone.setError(ex.getMessage());
+        respone.setMessage("404 Not Found. URL may be not existed ...");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(respone);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

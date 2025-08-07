@@ -1,9 +1,5 @@
 package vn.tuantrung.jobhunter.controller;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -15,12 +11,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.turkraft.springfilter.boot.Filter;
 
+import jakarta.validation.Valid;
 import vn.tuantrung.jobhunter.domain.User;
+import vn.tuantrung.jobhunter.domain.dto.ResCreateUserDTO;
+import vn.tuantrung.jobhunter.domain.dto.ResUpdateUserDTO;
+import vn.tuantrung.jobhunter.domain.dto.ResUserDTO;
 import vn.tuantrung.jobhunter.domain.dto.ResultPaginationDTO;
 import vn.tuantrung.jobhunter.service.UserService;
 import vn.tuantrung.jobhunter.util.annotation.ApiMessage;
@@ -42,42 +41,57 @@ public class UserController {
 
     // @GetMapping("/users/create")
     @PostMapping("/users")
-    public ResponseEntity<User> createNewUser(@RequestBody User postUser) {
+    @ApiMessage("Create a user")
+    public ResponseEntity<ResCreateUserDTO> createNewUser(@Valid @RequestBody User postUser) throws IdInvalidException {
+        boolean isEmailExist = this.userService.isEmailExist(postUser.getEmail());
+        if (isEmailExist) {
+            throw new IdInvalidException("Email " + postUser.getEmail() + "is existed, please use correct email");
+        }
+
         String hashPassword = this.passwordEncoder.encode(postUser.getPassword());
         postUser.setPassword(hashPassword);
         User trungUser = this.userService.handleCreateUser(postUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(trungUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.covertResCreateUserDTO(trungUser));
     }
 
     @DeleteMapping("/users/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable("id") long id) throws IdInvalidException {
-        if (id >= 1500) {
-            throw new IdInvalidException("Id must be greater than 1501");
+    @ApiMessage("delete a user")
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") long id) throws IdInvalidException {
+        User currentUser = this.userService.fetchUserById(id);
+        if (currentUser == null) {
+            throw new IdInvalidException("User with id = " + id + " is not existed");
+
         }
         this.userService.handleDeleteUser(id);
-        // return ResponseEntity.ok("trungUser");
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("trungUser");
+        return ResponseEntity.ok(null);
     }
 
     @GetMapping("/users/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable("id") long id) {
+    @ApiMessage("fetch user by id")
+    public ResponseEntity<ResUserDTO> getUserById(@PathVariable("id") long id) throws IdInvalidException {
         User fetchUser = this.userService.fetchUserById(id);
+        if (fetchUser == null) {
+            throw new IdInvalidException("User with id = " + id + " is not existed");
+        }
         // return ResponseEntity.ok(fetchUser);
-        return ResponseEntity.status(HttpStatus.OK).body(fetchUser);
+        return ResponseEntity.status(HttpStatus.OK).body(this.userService.convertToResUserDTO(fetchUser));
     }
 
     @GetMapping("/users")
     @ApiMessage("fetch all users")
     public ResponseEntity<ResultPaginationDTO> getAllUser(@Filter Specification<User> specification,
-            Pageable pageable)
-    {
+            Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(this.userService.fetchAllUsers(specification, pageable));
     }
 
     @PutMapping("/users")
-    public ResponseEntity<User> updateUser(@RequestBody User user) {
+    @ApiMessage("Update a user")
+    public ResponseEntity<ResUpdateUserDTO> updateUser(@RequestBody User user) throws IdInvalidException {
         User trungUser = this.userService.handleUpdateUser(user);
-        return ResponseEntity.ok(trungUser);
+        if (trungUser == null) {
+            throw new IdInvalidException("User with id = " + user.getId() + " is not existed");
+        }
+        return ResponseEntity.ok(this.userService.convertToResUpdateUserDTO(trungUser));
     }
 
 }

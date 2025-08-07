@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.tuantrung.jobhunter.util.error.IdInvalidException;
 
 @RestController
+
 public class HelloController {
 
     @GetMapping("/")
