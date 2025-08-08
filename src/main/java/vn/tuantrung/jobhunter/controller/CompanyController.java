@@ -16,7 +16,7 @@ import com.turkraft.springfilter.boot.Filter;
 import jakarta.validation.Valid;
 import vn.tuantrung.jobhunter.domain.Company;
 import vn.tuantrung.jobhunter.domain.User;
-import vn.tuantrung.jobhunter.domain.dto.ResultPaginationDTO;
+import vn.tuantrung.jobhunter.domain.response.ResultPaginationDTO;
 import vn.tuantrung.jobhunter.service.CompanyService;
 import vn.tuantrung.jobhunter.util.annotation.ApiMessage;
 

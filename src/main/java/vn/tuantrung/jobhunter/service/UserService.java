@@ -11,10 +11,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import vn.tuantrung.jobhunter.domain.User;
-import vn.tuantrung.jobhunter.domain.dto.ResCreateUserDTO;
-import vn.tuantrung.jobhunter.domain.dto.ResUpdateUserDTO;
-import vn.tuantrung.jobhunter.domain.dto.ResUserDTO;
-import vn.tuantrung.jobhunter.domain.dto.ResultPaginationDTO;
+import vn.tuantrung.jobhunter.domain.response.ResCreateUserDTO;
+import vn.tuantrung.jobhunter.domain.response.ResUpdateUserDTO;
+import vn.tuantrung.jobhunter.domain.response.ResUserDTO;
+import vn.tuantrung.jobhunter.domain.response.ResultPaginationDTO;
 import vn.tuantrung.jobhunter.repository.UserRepository;
 
 @Service
