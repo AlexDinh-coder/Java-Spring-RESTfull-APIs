@@ -2,8 +2,6 @@ package vn.tuantrung.jobhunter.domain;
 
 import java.time.Instant;
 
-
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
@@ -18,6 +16,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import vn.tuantrung.jobhunter.util.SecurityUtil;
+
 @Entity
 @Table(name = "companies")
 @Getter
@@ -37,7 +36,7 @@ public class Company {
 
     private String logo;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
+    // @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
 
     private Instant createdAt;
 
@@ -49,19 +48,19 @@ public class Company {
 
     @PrePersist
     public void handleBeforeCreate() {
-        this.createdBy = SecurityUtil.getCurrentUserLogin().isPresent() == true ?
-        SecurityUtil.getCurrentUserLogin().get() : "";
+        this.createdBy = SecurityUtil.getCurrentUserLogin().isPresent() == true
+                ? SecurityUtil.getCurrentUserLogin().get()
+                : "";
         this.createdAt = Instant.now();
 
     }
 
     @PreUpdate
     public void handleBeforeUpdate() {
-        this.updatedBy = SecurityUtil.getCurrentUserLogin().isPresent() == true ?
-        SecurityUtil.getCurrentUserLogin().get() : "";
+        this.updatedBy = SecurityUtil.getCurrentUserLogin().isPresent() == true
+                ? SecurityUtil.getCurrentUserLogin().get()
+                : "";
         this.updatedAt = Instant.now();
     }
-
-    
 
 }
