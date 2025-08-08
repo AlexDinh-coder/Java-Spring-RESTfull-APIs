@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import vn.tuantrung.jobhunter.domain.RestRespone;
+import vn.tuantrung.jobhunter.domain.response.RestRespone;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;

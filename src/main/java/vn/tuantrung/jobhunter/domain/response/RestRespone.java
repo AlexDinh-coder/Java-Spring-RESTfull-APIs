@@ -1,4 +1,4 @@
-package vn.tuantrung.jobhunter.domain;
+package vn.tuantrung.jobhunter.domain.response;
 
 public class RestRespone<T> {
     private int statusCode;
