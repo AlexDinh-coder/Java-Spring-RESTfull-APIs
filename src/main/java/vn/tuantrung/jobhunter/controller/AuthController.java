@@ -63,12 +63,15 @@ public class AuthController {
         ResLoginDTO res = new ResLoginDTO();
         User currentUserDB = this.userService.handleGetUserByUsername(loginDto.getUsername());
         if (currentUserDB != null) {
-            ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(currentUserDB.getId(), currentUserDB.getEmail(),
-                    currentUserDB.getName());
+            ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(
+                    currentUserDB.getId(),
+                    currentUserDB.getEmail(),
+                    currentUserDB.getName(),
+                    currentUserDB.getRole());
             res.setUser(userLogin);
         }
 
-        String access_token = this.securityUtil.createAccessToken(authentication.getName(), res.getUser());
+        String access_token = this.securityUtil.createAccessToken(authentication.getName(), res);
 
         res.setAccessToken(access_token);
 
@@ -100,6 +103,8 @@ public class AuthController {
             userLogin.setId(currentUserDB.getId());
             userLogin.setEmail(currentUserDB.getEmail());
             userLogin.setName(currentUserDB.getName());
+            userLogin.setRole(currentUserDB.getRole());
+
             userGetAccount.setUser(userLogin);
 
         }
@@ -127,12 +132,15 @@ public class AuthController {
         ResLoginDTO res = new ResLoginDTO();
         User currentUserDB = this.userService.handleGetUserByUsername(email);
         if (currentUserDB != null) {
-            ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(currentUserDB.getId(), currentUserDB.getEmail(),
-                    currentUserDB.getName());
+            ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(
+                    currentUserDB.getId(),
+                    currentUserDB.getEmail(),
+                    currentUserDB.getName(),
+                    currentUserDB.getRole());
             res.setUser(userLogin);
         }
 
-        String access_token = this.securityUtil.createAccessToken(email, res.getUser());
+        String access_token = this.securityUtil.createAccessToken(email, res);
 
         res.setAccessToken(access_token);
 
@@ -164,10 +172,10 @@ public class AuthController {
 
         }
 
-        //update refresh token = null
+        // update refresh token = null
         this.userService.updateUserToken(null, email);
 
-        //remove refresh token cookie
+        // remove refresh token cookie
         ResponseCookie deletResponseCookie = ResponseCookie.from("refresh_token", null)
                 .httpOnly(true)
                 .secure(true)
