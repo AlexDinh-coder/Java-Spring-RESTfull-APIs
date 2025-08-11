@@ -14,6 +14,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import vn.tuantrung.jobhunter.util.SecurityUtil;
@@ -28,8 +29,10 @@ public class Resume {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @NotBlank(message = "Email is not empty")
     private String email;
 
+    @NotBlank(message = "Url is not empty (Upload CV is not successful)")
     private String url;
 
     @Enumerated(EnumType.STRING)
