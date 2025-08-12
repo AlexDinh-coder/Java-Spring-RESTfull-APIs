@@ -39,7 +39,7 @@ public class UserController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // @GetMapping("/users/create")
+   
     @PostMapping("/users")
     @ApiMessage("Create a user")
     public ResponseEntity<ResCreateUserDTO> createNewUser(@Valid @RequestBody User postUser) throws IdInvalidException {

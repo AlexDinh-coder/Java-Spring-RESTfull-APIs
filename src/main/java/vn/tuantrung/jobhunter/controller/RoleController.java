@@ -53,10 +53,10 @@ public class RoleController {
             throw new IdInvalidException("Role với id = " + r.getId() + " không tồn tại");
         }
 
-        // check name
-        if (this.roleService.existsByName(r.getName())) {
-            throw new IdInvalidException("Role với name = " + r.getName() + " đã tồn tại");
-        }
+        // // check name
+        // if (this.roleService.existsByName(r.getName())) {
+        //     throw new IdInvalidException("Role với name = " + r.getName() + " đã tồn tại");
+        // }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(this.roleService.updateRole(r));
     }
@@ -77,6 +77,16 @@ public class RoleController {
     @ApiMessage("Get all roles")
     public ResponseEntity<ResultPaginationDTO> getRoles(@Filter Specification<Role> spec, Pageable pageable) {
         return ResponseEntity.ok().body(this.roleService.getRoles(spec,pageable));
+    }
+    
+    @GetMapping("/roles/{id}")
+    @ApiMessage("Get a role by id")
+    public ResponseEntity<Role> getRoleById(@PathVariable("id") long id) throws IdInvalidException {
+        Role role = this.roleService.fetchById(id);
+        if(role == null) {
+            throw new IdInvalidException("Role with id = " + id + " does not exist");
+        }
+        return ResponseEntity.ok().body(role);
     }
     
 }

@@ -6,10 +6,17 @@ import java.util.stream.Collectors;
 
 import javax.naming.spi.DirStateFactory.Result;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import com.turkraft.springfilter.builder.FilterBuilder;
+import com.turkraft.springfilter.converter.FilterSpecification;
+import com.turkraft.springfilter.converter.FilterSpecificationConverter;
+import com.turkraft.springfilter.parser.FilterParser;
+import com.turkraft.springfilter.parser.node.FilterNode;
 
 import vn.tuantrung.jobhunter.domain.Job;
 import vn.tuantrung.jobhunter.domain.Resume;
@@ -22,9 +29,19 @@ import vn.tuantrung.jobhunter.domain.response.resume.ResUpdateResumeDTO;
 import vn.tuantrung.jobhunter.repository.JobRepository;
 import vn.tuantrung.jobhunter.repository.ResumeRepository;
 import vn.tuantrung.jobhunter.repository.UserRepository;
+import vn.tuantrung.jobhunter.util.SecurityUtil;
 
 @Service
 public class ResumeService {
+    @Autowired
+    FilterBuilder fb;
+
+    @Autowired
+    private FilterParser filterParser;
+
+    @Autowired
+    private FilterSpecificationConverter filterSpecificationConverter;
+
     private final ResumeRepository resumeRepository;
     private final UserRepository userRepository;
     private final JobRepository jobRepository;
@@ -99,8 +116,8 @@ public class ResumeService {
         res.setUpdatedAt(resume.getUpdatedAt());
         res.setUpdatedBy(resume.getUpdatedBy());
 
-        //check if job is null
-        if(resume.getJob() != null) {
+        // check if job is null
+        if (resume.getJob() != null) {
             res.setCompanyName(resume.getJob().getCompany().getName());
         }
 
@@ -128,9 +145,40 @@ public class ResumeService {
         List<ResFetchResumeDTO> listResume = resumePage.getContent()
                 .stream().map(item -> this.getResumeById(item))
                 .collect(Collectors.toList());
-         rs.setResult(listResume);     
-         
-         return rs;
+        rs.setResult(listResume);
+
+        return rs;
+    }
+
+    public ResultPaginationDTO fetchResumeByUser(Pageable pageable) {
+       // query builder
+        String email = SecurityUtil.getCurrentUserLogin().isPresent() == true
+                ? SecurityUtil.getCurrentUserLogin().get()
+                : "";
+        FilterNode node = filterParser.parse("email='" + email + "'");
+        FilterSpecification<Resume> spec = filterSpecificationConverter.convert(node);
+        Page<Resume> pageResume = this.resumeRepository.findAll(spec, pageable);
+
+        ResultPaginationDTO rs = new ResultPaginationDTO();
+        ResultPaginationDTO.Meta mt = new ResultPaginationDTO.Meta();
+
+        mt.setPage(pageable.getPageNumber() + 1);
+        mt.setPageSize(pageable.getPageSize());
+
+        mt.setPages(pageResume.getTotalPages());
+        mt.setTotal(pageResume.getTotalElements());
+
+        rs.setMeta(mt);
+
+        // remove sensitive data
+        List<ResFetchResumeDTO> listResume = pageResume.getContent()
+                .stream().map(item -> this.getResumeById(item))
+                .collect(Collectors.toList());
+
+        rs.setResult(listResume);
+
+        return rs;
+        
     }
 
 }

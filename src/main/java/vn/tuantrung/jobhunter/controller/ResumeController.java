@@ -55,7 +55,7 @@ public class ResumeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(this.resumeService.createNewResume(resume));
     }
 
-    @PutMapping("resumes")
+    @PutMapping("/resumes")
     @ApiMessage("Update a resume")
     public ResponseEntity<ResUpdateResumeDTO> updateResume(@RequestBody Resume resume) throws IdInvalidException {
         //check id exists
@@ -101,6 +101,12 @@ public class ResumeController {
         return ResponseEntity.ok().body(this.resumeService.fetchAllResume(spec, pageable));
     }
     
+    @PostMapping("/resumes/by-user")
+    @ApiMessage("Get list resumes by user")
+    public ResponseEntity<ResultPaginationDTO> fetchResymeByUser(Pageable pageable) {
+        
+        return ResponseEntity.ok().body(this.resumeService.fetchResumeByUser(pageable));
+    }
     
     
     
