@@ -1,20 +1,21 @@
 package vn.tuantrung.jobhunter.service;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
+
 
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import vn.tuantrung.jobhunter.domain.Job;
+
 import vn.tuantrung.jobhunter.repository.JobRepository;
 
 @Service
@@ -54,12 +55,12 @@ public class EmailService {
         }
     }
 
-    public void sendEmailFromTemplateSync(String to, String subject, String templateName) {
+    @Async
+    public void sendEmailFromTemplateSync(String to, String subject, String templateName, String username, Object value) {
         Context context = new Context();
-        List<Job> arrJobs = this.jobRepository.findAll();
-        String name = "Alex";
-        context.setVariable("name", name);
-        context.setVariable("jobs", arrJobs);
+       
+        context.setVariable("name", username);
+        context.setVariable("jobs", value);
 
         String content = this.templateEngine.process(templateName, context);
         this.sendEmailSync(to, subject, content, false, true);

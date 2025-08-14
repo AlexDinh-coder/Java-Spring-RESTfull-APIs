@@ -4,10 +4,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import vn.tuantrung.jobhunter.domain.Job;
 import vn.tuantrung.jobhunter.domain.Skill;
 import vn.tuantrung.jobhunter.domain.Subscriber;
+import vn.tuantrung.jobhunter.domain.response.email.ResEmailJob;
+import vn.tuantrung.jobhunter.repository.JobRepository;
 import vn.tuantrung.jobhunter.repository.SkillRepository;
 import vn.tuantrung.jobhunter.repository.SubscriberRepository;
 
@@ -15,14 +19,24 @@ import vn.tuantrung.jobhunter.repository.SubscriberRepository;
 public class SubscriberService {
     private final SubscriberRepository subscriberRepository;
     private final SkillRepository skillRepository;
+    private final JobRepository jobRepository;
+    private final EmailService emailService;
 
-    public SubscriberService(SubscriberRepository subscriberRepository, SkillRepository skillRepository) {
+    public SubscriberService(SubscriberRepository subscriberRepository, SkillRepository skillRepository,
+            JobRepository jobRepository, EmailService emailService) {
         this.subscriberRepository = subscriberRepository;
         this.skillRepository = skillRepository;
+        this.emailService = emailService;
+        this.jobRepository = jobRepository;
     }
 
     public boolean isExistEmail(String email) {
         return this.subscriberRepository.existsByEmail(email);
+    }
+
+    @Scheduled(fixedDelay = 1000)
+    public void testCron() {
+        System.out.println("TEST CRONE H");
     }
 
     public Subscriber createSubscriber(Subscriber sub) {
@@ -46,6 +60,18 @@ public class SubscriberService {
 
     }
 
+    public ResEmailJob convertJobToSendEmail(Job job) {
+        ResEmailJob res = new ResEmailJob();
+        res.setName(job.getName());
+        res.setSalary(job.getSalary());
+        res.setCompany(new ResEmailJob.CompanyEmail(job.getCompany().getName()));
+        List<Skill> skills = job.getSkills();
+        List<ResEmailJob.SkillEmail> s = skills.stream().map(skill -> new ResEmailJob.SkillEmail(skill.getName()))
+                .collect(Collectors.toList());
+        res.setSkills(s);
+        return res;
+    }
+
     public Subscriber updateSubscriber(Subscriber subsDB, Subscriber subsRequest) {
         // check skills
         if (subsRequest.getSkills() != null) {
@@ -58,6 +84,30 @@ public class SubscriberService {
         }
 
         return this.subscriberRepository.save(subsDB);
+    }
+
+    public void sendSubscribersEmailJobs() {
+        List<Subscriber> listSubs = this.subscriberRepository.findAll();
+        if (listSubs != null && listSubs.size() > 0) {
+            for (Subscriber sub : listSubs) {
+                List<Skill> listSkills = sub.getSkills();
+                if (listSkills != null && listSkills.size() > 0) {
+                    List<Job> listJobs = this.jobRepository.findBySkillsIn(listSkills);
+                    if (listJobs != null && listJobs.size() > 0) {
+
+                        List<ResEmailJob> arr = listJobs.stream().map(
+                                job -> this.convertJobToSendEmail(job)).collect(Collectors.toList());
+
+                        this.emailService.sendEmailFromTemplateSync(
+                                sub.getEmail(),
+                                "Cơ hội việc làm hot đang chờ đón bạn, khám phá ngay",
+                                "job",
+                                sub.getName(),
+                                arr);
+                    }
+                }
+            }
+        }
     }
 
 }
