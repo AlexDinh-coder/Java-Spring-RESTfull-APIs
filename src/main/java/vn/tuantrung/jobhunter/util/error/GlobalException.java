@@ -28,8 +28,8 @@ public class GlobalException {
     public ResponseEntity<RestRespone<Object>> handleIdException(Exception ex) {
         RestRespone<Object> res = new RestRespone<Object>();
         res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-        res.setError(ex.getMessage());
-        res.setMessage("Exception occurred");
+        res.setMessage(ex.getMessage());
+        res.setError("Exception occurred"); 
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
@@ -39,8 +39,8 @@ public class GlobalException {
     public ResponseEntity<RestRespone<Object>> handleNotFoundException(Exception ex) {
         RestRespone<Object> respone = new RestRespone<Object>();
         respone.setStatusCode(HttpStatus.NOT_FOUND.value());
-        respone.setError(ex.getMessage());
-        respone.setMessage("404 Not Found. URL may be not existed ...");
+        respone.setMessage(ex.getMessage());
+        respone.setError("404 Not Found. URL may be not existed ..."); 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(respone);
     }
 
@@ -66,8 +66,8 @@ public class GlobalException {
     public ResponseEntity<RestRespone<Object>> handleFileUploadException(Exception ex) {
         RestRespone<Object> res = new RestRespone<Object>();
         res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-        res.setError(ex.getMessage());
-        res.setMessage("Exception upload file....");
+        res.setMessage(ex.getMessage()); 
+        res.setError("Exception upload file....");
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
@@ -78,9 +78,9 @@ public class GlobalException {
     })
     public ResponseEntity<RestRespone<Object>> handlePermissionException(Exception ex) {
         RestRespone<Object> res = new RestRespone<Object>();
-        res.setStatusCode(HttpStatus.FORBIDDEN.value());
-        res.setError(ex.getMessage());
-        res.setMessage("Forbidden access to this resource");
+        res.setStatusCode(HttpStatus.FORBIDDEN.value());  
+        res.setMessage(ex.getMessage()); 
+        res.setError("Forbidden access to this resource");
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
     }

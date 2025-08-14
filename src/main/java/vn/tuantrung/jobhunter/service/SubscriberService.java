@@ -34,10 +34,10 @@ public class SubscriberService {
         return this.subscriberRepository.existsByEmail(email);
     }
 
-    @Scheduled(fixedDelay = 1000)
-    public void testCron() {
-        System.out.println("TEST CRONE H");
-    }
+    // @Scheduled(cron =  "*/10 * * * * *")
+    // public void testCron() {
+    //     System.out.println("TEST CRONE H");
+    // }
 
     public Subscriber createSubscriber(Subscriber sub) {
         // check skills
@@ -108,6 +108,10 @@ public class SubscriberService {
                 }
             }
         }
+    }
+
+    public Subscriber findByEmail(String email) {
+        return this.subscriberRepository.findByEmail(email);
     }
 
 }

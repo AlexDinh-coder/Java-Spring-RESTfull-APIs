@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import vn.tuantrung.jobhunter.domain.Subscriber;
 import vn.tuantrung.jobhunter.service.SubscriberService;
+import vn.tuantrung.jobhunter.util.SecurityUtil;
 import vn.tuantrung.jobhunter.util.annotation.ApiMessage;
 import vn.tuantrung.jobhunter.util.error.IdInvalidException;
 
@@ -50,5 +51,16 @@ public class SubscriberController {
         
         return ResponseEntity.ok().body(this.subscriberService.updateSubscriber(subsDB, subsRequest));
     }
+
+    @PostMapping("/subscribers/skills")
+    @ApiMessage("Get subscriber's skill")
+    public ResponseEntity<Subscriber> getSubscribersSkill() {
+        String email = SecurityUtil.getCurrentUserLogin().isPresent() == true 
+                ? SecurityUtil.getCurrentUserLogin().get()
+                : "";
+        
+        return ResponseEntity.ok().body(this.subscriberService.findByEmail(email));
+    }
+    
     
 }
