@@ -18,6 +18,17 @@ import vn.tuantrung.jobhunter.domain.response.RestRespone;
 
 @RestControllerAdvice
 public class GlobalException {
+    //handle all exception
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<RestRespone<Object>> handleAllException(Exception ex) {
+        RestRespone<Object> res = new RestRespone<Object>();
+        res.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        res.setMessage(ex.getMessage());
+        res.setError("Internal Server Error");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
+    }
+
+
     @ExceptionHandler(value = {
 
             UsernameNotFoundException.class,
